@@ -1,0 +1,51 @@
+Note that a number is beautiful if and only if it is divisible by D, but not by D^2
+
+Suppose X is not divisible by D^2. Then, the only representation of X as a product of beautiful numbers is to just use one number X.
+
+Two ways that two representation of X as a product of bearutiful numbers can be different:
+1. They could have different amounts of numbers.
+
+10*10*10 or 20*50
+
+2. The numbers in the set could be different 
+
+When might two representations have different amounts of numbers?
+
+Let's compute the maximum and minimum amounts of numbers in a representation of X as a product of beautiful numbers.
+
+Let P be the largest pwer of D that's a factor of X i.e. D^P is a pactor of X. The maximum amount of Numbers in a representation of X is P.
+
+What about the minimum amount of numbers?
+
+Case 1. D has multiple prime factors
+
+Then, we can have only two numbers. Idea: put one copy of D in each of our two numbers, then pick some prime factors of D and put all the copies of that prime factor in one number and put everything else in the other number.
+
+1000 10 case:
+20 50 
+We have 10 left over in X (1000/(10*10))
+
+Case 2. Suppose D has only one prime factor. We want to include as many copies of this prime factor in each of our beautiful numbers without making any of them divisible by D^2.
+
+D = p^e for prime p and exponent e.
+
+Then, a beautiful number must contain at most 2e-1 factors of p.
+
+That means that if X contains K copies of p in its prime factors, we need at least  
+ceil(K/(2e-1)) numbers in this case.
+
+If the minimum no in a representation != max no in a representation, the there are two different representations, so the answer is yes.
+
+Otherwise, we know there must be exactly P numbers in any representation. 
+
+Each of these numbers must contain D, so we can give each of them a D and then divide X by D^P. Then, we need to decide if there are two different ways to represent whats left over, 
+X/D^P, as a product of various numbers.
+
+If X/D^P is prime or 1, then there is only one way to represent it as a product of numbers:
+just use X/D^P
+
+But if it's not prime, then we can represent it in multiple ways. We can either use X/D^P, or we can pull out some prime factor and write it as the product of two numbers.
+
+
+
+

@@ -1,0 +1,103 @@
+
+IMP NOTE : for query on range L,R is 0 based indexing i.e. : you can query from (0, n-1)
+
+// Range Sum of array in O(log(n)) query time
+
+const ll MAXN = 100005, K = 26;
+ll spt[MAXN][K + 1];
+
+void fill(vi &a, ll n)
+{
+    for(ll i = 0; i < n; i++){
+        spt[i][0] = a[i];
+    }
+
+    for(ll j = 1; j <= K; j++){
+        for(ll i = 0; i + (1LL << j) <= n; i++){
+            spt[i][j] = spt[i][j-1] + spt[i + (1 << (j - 1))][j - 1];
+        }
+    }
+}
+
+ll query(ll l, ll r)
+{
+    ll sm = 0;
+    for(ll i = K; i >= 0; i--){
+        if((1LL << i) <= r - l + 1){
+            sm += spt[l][i];
+            l += (1LL << i);
+        }
+    }
+    return sm;
+}
+
+
+// Range Minimum of array in O(1) query time
+
+const ll MAXN = 100005, K = 26;
+ll spt[MAXN][K + 1], lg[MAXN + 1];
+
+void fill(vi &a, ll n)
+{
+    for(ll i = 0; i < n; i++){
+        spt[i][0] = a[i];
+    }
+
+    for(ll j = 1; j <= K; j++){
+        for(ll i = 0; i + (1LL << j) <= n; i++){
+            spt[i][j] = min(spt[i][j-1], spt[i + (1 << (j - 1))][j - 1]);
+        }
+    }
+
+    lg[1] = 0;
+    for(ll i = 2; i <= MAXN; i++){
+        lg[i] = lg[i/2] + 1;
+    }
+}
+
+ll query(ll l, ll r)
+{
+    ll j = lg[r - l + 1];
+    ll mn = min(spt[l][j], spt[r - (1LL << j) + 1][j]);
+    return mn;
+}
+
+
+// Intersecion of continues intervals or arrays in a range in O(1) query time
+
+const ll MAXN = 100001, K = 26;
+vector<vpii> spt(MAXN, vpii (K+1, {-1,INF}));
+ll lg[MAXN + 1];
+vpii arr;
+
+pii merge(pii x, pii y)
+{   
+    if(x.ff > y.ff)swap(x, y);
+    if(x.ss < y.ff)return {1, 0};  // 0 length interval if no intersection possible
+    return {y.ff, min(x.ss, y.ss)};
+}
+
+void fill(ll n)
+{
+    for(ll i = 0; i < n; i++){
+        spt[i][0] = arr[i];
+    }
+
+    for(ll j = 1; j <= K; j++){
+        for(ll i = 0; i + (1LL << j) <= n; i++){
+            spt[i][j] = merge(spt[i][j-1], spt[i + (1 << (j - 1))][j - 1]);
+        }
+    }
+
+    lg[1] = 0;
+    for(ll i = 2; i <= MAXN; i++){
+        lg[i] = lg[i/2] + 1;
+    }
+}
+
+pii query(ll l, ll r)
+{
+    ll j = lg[r - l + 1];
+    auto mn = merge(spt[l][j], spt[r - (1LL << j) + 1][j]);
+    return mn;
+}

@@ -1,0 +1,24 @@
+vector<ll> lis(vi &a){
+    ll n = a.size();
+    vector<ll> f(n), b(n);
+    ll res = 0;
+    for (ll i = 0; i < n; ++i) {
+        b[i] = INF;
+        f[i] = lb(b.begin(),b.begin()+res+1,a[i])-b.begin();
+        res = max(res, f[i] + 1);
+        b[f[i]] = a[i];          
+    }
+    vector<ll> LIS;
+    while (n--)
+    {
+       if (f[n]+1 == res)
+       {
+            LIS.emplace_back(a[n]);
+            --res;
+       }
+    }
+    // for(auto &it : f)it++; // f[i] = length of LIS till INDEX
+    reverse(all(LIS));
+    // ll size = LIS.size();
+    return LIS;
+}

@@ -1,0 +1,79 @@
+const ll N = 200000;
+vector<ll> adj[N+1];
+ll up[N+1][32];
+ll lvl[N+1];
+
+
+void dfs(ll curr, ll par, ll level = 0)
+{
+    lvl[curr] = level;
+    for(auto node : adj[curr]){
+        if(node==par)continue;
+        dfs(node, curr, level+1);
+    }
+}
+
+
+void binary_lifting(ll curr, ll par)
+{
+    up[curr][0] = par;
+    for(ll i = 1; i < 32; i++){
+        if(up[curr][i-1]!=-1){
+            up[curr][i] = up[up[curr][i-1]][i-1]; 
+        }
+        else up[curr][i] = -1;
+    }
+
+    for(auto node : adj[curr]){
+        if(node==par)continue;
+        binary_lifting(node, curr);
+    }
+}
+
+
+ll query(ll curr, ll jump)
+{
+    for(ll i = 31; i >= 0; i--){
+        if(curr==-1 || jump==0)break;
+        if(jump >= (1LL<<i)){
+            jump -= (1LL<<i);
+            curr = up[curr][i];
+        }
+    }
+    return curr;
+}
+
+
+// LCA in log(n) time
+
+ll LCA(ll u, ll v)
+{
+    if(lvl[u] < lvl[v])swap(u,v);
+    u = query(u, lvl[u]-lvl[v]);
+    if(u==v)return u;
+    for(ll i= 31; i >= 0; --i){
+        if(up[u][i]!=up[v][i]){
+            u = up[u][i]; 
+            v = up[v][i];
+        }
+    }
+    return query(u, 1);
+}
+
+
+// LCA in (log(n))^2 time
+
+ll LCA(ll u, ll v)
+{
+    if(lvl[u] < lvl[v])swap(u,v);
+    u = query(u, lvl[u] - lvl[v]);
+    ll l = 0, r = lvl[u];
+    while(l != r){
+        ll mid = (l + r)/2;
+        ll x1 = query(u, mid);
+        ll x2 = query(v, mid);
+        if(x1==x2)r = mid;
+        else l = mid + 1;
+    }
+    return query(u, l);
+}

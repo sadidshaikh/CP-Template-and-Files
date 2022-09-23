@@ -1,0 +1,97 @@
+
+// Sums and update values and sums
+
+class Segtree{
+
+    int size;
+    vector<ll> sums;
+
+    public:
+        Segtree(int n){
+            size = 1;
+            while(size < n)size *= 2;
+            sums.assign(2*size, 0);
+        }    
+
+        void build(vector<ll> &a){
+            for(int i = 0; i < (int)a.size(); ++i){
+                sums[i+size-1] = a[i];
+            }
+            for(int i = size-2; i >= 0; --i){
+                sums[i] = sums[2*i+1] + sums[2*i+2];
+            }
+        }   
+
+        void update(int i, ll val){
+            i += size - 1;
+            sums[i] += val;
+            while(i){
+                i = (i - 1)/2;
+                sums[i] = sums[2*i+1] + sums[2*i+2];
+            }
+        }
+
+        int query(int l, int r){
+            ll ans = 0;
+            l += size-1, r += size -1;
+            while(l < r){
+                if(!(l&1)){
+                    ans += sums[l];
+                }
+                if(!(r&1)){
+                    ans += sums[--r];
+                }
+                l /= 2; r /= 2;
+            }
+            return ans;
+        }
+};
+
+
+// Finding Minimum in a range
+
+class Segtree{
+
+    int size;
+    vector<ll> values;
+
+    public:
+        Segtree(int n){
+            size = 1;
+            while(size < n)size *= 2;
+            values.assign(2*size, INF);
+        }
+
+        void build(vector<ll> &a){
+            for(int i = 0; i < (int)a.size(); ++i){
+                values[i+size-1] = a[i];
+            }
+            for(int i = size-2; i >= 0; --i){
+                values[i] = min(values[2*i+1], values[2*i+2]);
+            }
+        }     
+
+        void update(int i, ll val){
+            i += size - 1;
+            values[i] = val;
+            while(i){
+                i = (i - 1)/2;
+                values[i] = min(values[2*i+1], values[2*i+2]);
+            }
+        }
+
+        int query(int l, int r){
+            ll ans = INF;
+            l += size-1, r += size -1;
+            while(l < r){
+                if(!(l&1)){
+                    ans = min(ans, values[l]);
+                }
+                if(!(r&1)){
+                    ans = min(ans, values[--r]);
+                }
+                l /= 2; r /= 2;
+            }
+            return ans;
+        }
+};

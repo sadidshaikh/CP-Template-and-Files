@@ -1,0 +1,23 @@
+ll n,m; cin >> n >> m;
+    vector<vector<pii>> adj(n);
+    vi d(n, INF);
+    set<pii> s;
+    d[0] = 0;
+    s.insert({0,0});
+    for(ll i = 1; i < n; i++)
+        s.insert({INF,i});
+    while(s.size()){
+        ll node = (*s.begin()).ss;
+        if((*s.begin()).ff == INF)break;
+        s.erase({(*s.begin()).ff, node});
+        for(auto edge : adj[node]){
+            ll to = edge.ff;
+            ll dist = edge.ss;
+            if(dist + d[node] < d[to]){
+                s.erase({d[to], to});
+                d[to] = dist + d[node];
+                s.insert({d[to], to});
+            }
+        }
+    }
+    printArray(d);

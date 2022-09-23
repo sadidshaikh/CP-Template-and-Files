@@ -1,0 +1,14 @@
+for(ll i = 1; i <= n; i++){
+    for(ll j = i; j <= n; j+=i){
+        dp[j]++;
+    }
+}
+
+// OR
+
+for(ll i = 1; i <= n; i++){
+    for(ll j = 1; j*j <= n; j++){
+        if(i%j==0)....
+        if(j*j==i)....
+    }
+}

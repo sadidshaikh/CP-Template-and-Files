@@ -1,0 +1,32 @@
+priority_queue<range, vector<range>, cmp> Q;
+
+struct range{
+    ll l,r;
+    range(ll l, ll r) : l(l), r(r){}
+};
+
+struct cmp{
+    bool operator()(range const& a, range const& b){
+        if(a.r-a.l == b.r-b.l)return (a.l >= b.l);
+        return (a.r-a.l < b.r-b.l);
+    }
+};
+
+// OR
+
+struct cmp{
+    bool operator() (const pair<int, int>&a, const pair<int, int>&b){
+        int lna=a.second-a.first+1;
+        int lnb=b.second-b.first+1;
+        if(lna==lnb) return a.first>b.first;
+        return lna<lnb;
+    }
+};
+
+// OR for set/multiset
+
+struct cmp {
+    bool operator()(const pii& x, const pii& y) const {return x.ff > y.ff; }
+};
+
+set<pii,cmp> s;

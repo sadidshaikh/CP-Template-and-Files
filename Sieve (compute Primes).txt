@@ -1,0 +1,82 @@
+void compPrime(ll N){
+    vi primes, leastFac;
+    rep(i,0,N)leastFac.pb(0);
+    leastFac[0]=1;leastFac[1]=1;
+    rep(i,2,N){
+        if(leastFac[i]==0){
+            primes.pb(i);
+            leastFac[i]=i;
+        }
+        ll sz = primes.size();
+        for(ll j=0;j<sz&&i*primes[j]<N&&primes[j]<=leastFac[i];j++){
+            leastFac[i*primes[j]] = primes[j];
+        }
+    }
+}
+
+
+// OR compute least factor
+
+const ll maxn = 1e7;
+vi primes,last(maxn+1);
+
+void calc(){
+    for(ll i = 2; i <= maxn; i++){
+        if(last[i]==0){
+            last[i]=i;
+            primes.pb(i);
+        }
+        for(auto &x : primes){
+            if(x > last[i] || x*i > maxn)break;
+            last[i*x] = x;
+        }
+    }
+}
+
+// OR Greatest Prime Factor
+
+const ll N = 100005;
+vi fac(N,1);
+
+for(ll i = 2; i <= N-3; i++){
+    if(fac[i] != 1)continue;
+    for(ll j = i; j <= N-3; j += i){
+        fac[j] = i;
+    }
+}
+
+// smallest prime factor
+
+vi spf(N + 1, 1);
+void sieve()
+{
+    for(ll i = 2; i < N; i++){
+        if(spf[i]==1){
+            for(ll j = i*i; j < N; j+=i){
+                if(spf[j]==1)spf[j] = i;
+            }
+        }
+    }
+}
+
+
+vector<map<ll,ll>> fac(maxn);
+map<ll,ll> minpow;
+ll ans = 0;
+void calc(){
+    for(ll i=2 ; i<maxn ; ++i)
+    {
+        ll temp = i;
+        for(ll j=2 ; j*j<=maxn ; ++j)
+        {
+            while(temp%j==0)
+            {
+                temp /= j;
+                fac[i][j]++;
+            }
+        }
+ 
+        if(temp>1)
+            fac[i][temp]++;
+    }
+}

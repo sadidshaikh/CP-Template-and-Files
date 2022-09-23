@@ -1,0 +1,722 @@
+Segment Tree:
+
+// Sums and update values and sums
+
+struct Segtree{
+
+    ll size;
+    vector<ll> sums;
+
+    void init(ll n){
+
+        size = 1;
+        while(size < n)size *= 2;
+        sums.assign(2*size, 0LL);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx){
+
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                sums[x] = a[lx];
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        sums[x] = sums[2*x+1] + sums[2*x+2];
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            sums[x] = val;
+            return;
+        }
+
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+
+        sums[x] = sums[2*x+1] + sums[2*x+2];
+    }
+
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+
+    ll seg_sum(ll l, ll r, ll x, ll lx, ll rx){
+
+        if(lx>=r || rx <= l)return 0;
+        if(lx>=l && rx <= r)return sums[x];
+
+        ll m = (lx + rx)/2;
+        ll s1 = seg_sum(l, r, 2*x+1, lx, m);
+        ll s2 = seg_sum(l, r, 2*x+2, m, rx);
+
+        return (s1 + s2);
+    }
+
+    ll seg_sum(ll l, ll r){
+        return seg_sum(l, r, 0, 0, size);
+    }
+
+};
+
+// Bitmask OR Seg Tree
+
+struct Segtree{
+    ll size;
+    vector<ll> val;
+
+    void init(ll n){
+        size = 1;
+        while(size < n)size *= 2;
+        val.assign(2*size, 0LL);
+    }
+
+    void build(string &s, ll x, ll lx, ll rx){
+        if(rx - lx == 1){
+            if(lx < s.size()){
+                val[x] = (1LL << (s[lx] - 'a'));
+            }
+            return;
+        }
+
+        ll mid = (lx + rx)/2;
+        build(s, 2*mid + 1, lx, mid);
+        build(s, 2*mid + 2, mid, rx);
+
+        val[x] = (val[2*mid + 1] | val[2*mid + 2]);
+    }
+
+    void build(string &s){
+        build(s, 0, 0, size);
+    }
+
+    void update(ll i, char c, ll x, ll lx, ll rx){
+        if(rx - lx == 1){
+            val[x] = (1LL << (c - 'a'));
+            return;
+        }
+
+        ll mid = (lx + rx)/2;
+        if(i < mid) update(i, c, 2*mid + 1, lx, mid);
+        else update(i, c, 2*mid + 2, mid, rx);
+
+        val[x] = (val[2*mid + 1] | val[2*mid + 2]);
+    }
+
+    void update(ll i, char c){
+        update(i, c, 0, 0, size);
+    }
+
+    ll query(ll l, ll r, ll x, ll lx, ll rx){
+        if(lx >= r or rx <= l)return 0;
+        if(lx >= l and rx <= r)return val[x];
+
+        ll mid = (lx + rx)/2;
+        ll s1 = query(l, r, 2*mid + 1, lx, mid);
+        ll s2 = query(l, r, 2*mid + 2, mid, rx);
+
+        return (s1 | s2);
+    }
+
+    ll query(ll l, ll r){
+        return query(l, r, 0, 0, size);
+    }
+};
+
+
+// Calculate Min on a Segment and update and calculate minimum
+
+struct Segtree{
+
+    ll size;
+    vector<ll> values;
+
+    void init(ll n){
+
+        size = 1;
+        while(size < n)size *= 2;
+        values.assign(2*size, INF);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx){
+
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                values[x] = a[lx];
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        values[x] = min(values[2*x+1], values[2*x+2]);
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            values[x] = val;
+            return;
+        }
+
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+
+        values[x] = min(values[2*x+1], values[2*x+2]);
+    }
+
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+
+    ll calc_min(ll l, ll r, ll x, ll lx, ll rx){
+
+        if(lx>=r || rx <= l)return INF;
+        if(lx>=l && rx <= r)return values[x];
+
+        ll m = (lx + rx)/2;
+        ll s1 = calc_min(l, r, 2*x+1, lx, m);
+        ll s2 = calc_min(l, r, 2*x+2, m, rx);
+
+        return min(s1,s2);
+    }
+
+    ll calc_min(ll l, ll r){
+        return calc_min(l, r, 0, 0, size);
+    }
+
+};
+
+
+// Calculate Max on a Segment and update and calculate Max
+
+struct Segtree{
+
+    ll size;
+    vector<ll> values;
+
+    void init(ll n){
+
+        size = 1;
+        while(size < n)size *= 2;
+        values.assign(2*size, maxN);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx){
+
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                values[x] = a[lx];
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        values[x] = max(values[2*x+1], values[2*x+2]);
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            values[x] = val;
+            return;
+        }
+
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+
+        values[x] = max(values[2*x+1], values[2*x+2]);
+    }
+
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+
+    ll calc_max(ll l, ll r, ll x, ll lx, ll rx){
+
+        if(lx>=r || rx <= l)return 0LL;
+        if(lx>=l && rx <= r)return values[x];
+
+        ll m = (lx + rx)/2;
+        ll s1 = calc_max(l, r, 2*x+1, lx, m);
+        ll s2 = calc_max(l, r, 2*x+2, m, rx);
+
+        return max(s1,s2);
+    }
+
+    ll calc_max(ll l, ll r){
+        return calc_max(l, r, 0, 0, size);
+    }
+
+};
+
+
+// Calculate Min on a Segment and number of elements equal to minimum on a segment and update and calculate minimum and number of elements equal to minimum on a segment
+
+struct item{
+    ll min_val,cnt;
+};
+
+struct Segtree{
+
+    ll size;
+    vector<item> values;
+
+    item NEUTRAL_ELEMENT = {INF,0};
+
+    item merge(item a, item b){
+        if(a.min_val < b.min_val)return a;
+        if(a.min_val > b.min_val)return b;
+        return {a.min_val, a.cnt + b.cnt};
+    }
+
+    void init(ll n){
+
+        size = 1;
+        while(size < n)size *= 2;
+        values.resize(2*size);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx){
+
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                values[x] = {a[lx], 1};
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        values[x] = merge(values[2*x+1], values[2*x+2]);
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            values[x] = {val, 1};
+            return;
+        }
+
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+
+        values[x] = merge(values[2*x+1], values[2*x+2]);
+    }
+
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+
+    item calc_min(ll l, ll r, ll x, ll lx, ll rx){
+
+        if(lx>=r || rx <= l)return NEUTRAL_ELEMENT;
+        if(lx>=l && rx <= r)return values[x];
+
+        ll m = (lx + rx)/2;
+        item s1 = calc_min(l, r, 2*x+1, lx, m);
+        item s2 = calc_min(l, r, 2*x+2, m, rx);
+
+        return merge(s1,s2);
+    }
+
+    item calc_min(ll l, ll r){
+        return calc_min(l, r, 0, 0, size);
+    }
+
+};
+
+
+// Segment Tree To Find The Segment With Maximum Sums
+
+struct node{
+    ll max_seg, max_pref, max_suff, sm;
+};
+
+struct Segtree{
+
+    ll size;
+    vector<node> sums;
+
+    node NEUTRAL_ELEMENT = {-INF, -INF, -INF};
+
+    node merge(node a, node b){
+        node temp;
+        temp.sm = a.sm + b.sm;
+        temp.max_seg = max({a.max_seg, b.max_seg, a.max_suff+b.max_pref});
+        temp.max_pref = max(a.max_pref, a.sm + b.max_pref);
+        temp.max_suff = max(b.max_suff, b.sm + a.max_suff);
+        return temp;
+    }
+
+    void init(ll n){
+        size = 1;
+        while(size < n)size *= 2;
+        sums.assign(size*2, NEUTRAL_ELEMENT);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx){
+
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                sums[x] = {a[lx], a[lx], a[lx], a[lx]};
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        sums[x] = merge(sums[2*x+1], sums[2*x+2]);
+    }
+
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            sums[x] = {max(0LL,val), val, val, val};
+            return;
+        }
+
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+
+        sums[x] = merge(sums[2*x+1], sums[2*x+2]);
+    }
+
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+
+    node query(ll l, ll r, ll x, ll lx, ll rx){
+        if(lx >= r or rx <= l)return NEUTRAL_ELEMENT;
+        if(lx >= l and rx <= r)return sums[x];
+
+        ll mid = (lx + rx)/2;
+        node v1 = query(l, r, 2*x + 1, lx, mid);
+        node v2 = query(l, r, 2*x + 2, mid, rx);
+
+        return merge(v1, v2);
+    }    
+
+    ll query(ll l, ll r){
+        return (query(l, r, 0, 0, size)).max_seg;
+    }
+};
+
+
+// Find index of K_th one
+
+struct Segtree{
+ 
+    ll size;
+    vector<ll> sums;
+ 
+    void init(ll n){
+ 
+        size = 1;
+        while(size < n)size *= 2;
+        sums.assign(2*size, 0LL);
+    }
+ 
+    void build(vi &a, ll x, ll lx, ll rx){
+ 
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                sums[x] = a[lx];
+            }
+            return;
+        }
+ 
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+ 
+        sums[x] = sums[2*x+1] + sums[2*x+2];
+    }
+ 
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+ 
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        
+        if(rx - lx == 1){
+            sums[x] = val;
+            return;
+        }
+ 
+        ll m = (lx + rx)/2;
+        if(i < m){
+            update(i, val, 2*x+1, lx, m);
+        }
+        else{
+            update(i, val, 2*x+2, m, rx);
+        }
+ 
+        sums[x] = sums[2*x+1] + sums[2*x+2];
+    }
+ 
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+ 
+    ll ans;
+    void kth_one(ll k, ll x, ll lx, ll rx){
+        if(rx-lx==1){
+            ans = lx;return;
+        }
+        ll mid = (lx+rx)/2;
+        if(k+1>sums[2*x+1])kth_one(k-sums[2*x+1], 2*x+2, mid, rx);
+        else kth_one(k, 2*x+1, lx, mid);
+    }
+ 
+    ll kth_one(ll k){
+        kth_one(k, 0, 0, size);
+        return ans;
+    }
+ 
+};
+
+// Find the index//value of the first element greater than equal to X in array(not sorted and sorted)
+
+struct Segtree{
+    vi max_value;
+    ll size;
+    void init(ll n){
+        size = log2(n); size = pow(2,size);
+        if(size!=n)size*=2;
+        max_value.assign(3*size,0);
+    }
+    void build(vi &a, ll x, ll lx, ll rx){
+        if(rx-lx==1){
+            if(lx<a.size())max_value[x] = a[lx]; 
+            return;
+        }
+        ll mid = (lx+rx)/2;
+        build(a, 2*x+1, lx, mid);
+        build(a, 2*x+2, mid, rx);
+        max_value[x] = max(max_value[2*x+1], max_value[2*x+2]);
+    }
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+    void update(ll i, ll val, ll x, ll lx, ll rx){
+        if(rx-lx==1){
+            max_value[x] = val;return;
+        }
+        ll mid = (lx+rx)/2;
+        if(i < mid)update(i, val, 2*x+1, lx, mid);
+        else update(i, val, 2*x+2, mid, rx);
+        max_value[x] = max(max_value[2*x+1], max_value[2*x+2]);
+    }
+    void update(ll i, ll val){
+        update(i, val, 0, 0, size);
+    }
+    ll ans;
+    void upper_bound_val(ll val, ll x, ll lx, ll rx){
+        if(rx-lx==1){
+            ans = lx;return;
+        }
+        ll mid = (lx+rx)/2;
+        if(max_value[2*x+1]>=val)upper_bound_val(val, 2*x+1, lx, mid);
+        else upper_bound_val(val, 2*x+2, mid, rx);
+    }
+    ll upper_bound_val(ll val){
+        upper_bound_val(val, 0, 0, size);
+        return ans;
+    }
+};
+
+// Maximum and Second Maximum of a segment with index of maximum element
+
+struct node{
+    ll mx1, idx, mx2;
+};
+
+struct Segtree{
+
+    ll size;
+    vector<node> values;
+
+    node NEUTRAL_ELEMENT = {0, -1, 0};
+
+    node merge(node a, node b)
+    {
+        node temp = NEUTRAL_ELEMENT;
+
+        if(a.mx1 >= b.mx1){
+            temp = {a.mx1, a.idx, max({b.mx1, b.mx2, a.mx2})};
+        }
+        else{
+            temp = {b.mx1, b.idx, max({a.mx1, b.mx2, a.mx2})};
+        }
+        return temp;
+    }
+
+    void init(ll n)
+    {
+        size = 1;
+        while(size < n)size *= 2;
+        values.assign(2*size, NEUTRAL_ELEMENT);
+    }
+
+    void build(vi &a, ll x, ll lx, ll rx)
+    {
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                values[x] = {a[lx], lx, 0};
+            }
+            return;
+        }
+
+        ll m = (lx+rx)/2;
+        build(a, 2*x+1, lx, m);
+        build(a, 2*x+2, m, rx);
+
+        values[x] = merge(values[2*x+1], values[2*x+2]);
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    node calc_max(ll l, ll r, ll x, ll lx, ll rx)
+    {
+        if(lx>=r || rx <= l)return NEUTRAL_ELEMENT;
+        if(lx>=l && rx <= r)return values[x];
+
+        ll m = (lx + rx)/2;
+        node s1 = calc_max(l, r, 2*x+1, lx, m);
+        node s2 = calc_max(l, r, 2*x+2, m, rx);
+
+        return merge(a, b);
+    }
+
+    node calc_max(ll l, ll r){
+        return calc_max(l, r, 0, 0, size);
+    }
+
+};
+
+// Intersection of Intervals in a segment
+
+struct interval
+{
+    ll l,r;    
+};
+
+struct Segtree
+{
+    ll size;
+    vector<interval> arr;
+
+    interval NEUTRAL_VAL = {-1, INF};
+
+    interval merge(interval a, interval b)
+    {
+        return {max(a.l, b.l), min(a.r, b.r)};
+    }
+
+    void init(ll n)
+    {
+        size = 1;
+        while(size < n)size *= 2;
+        arr.assign(2*size, NEUTRAL_VAL);
+    }
+
+    void build(vector<interval> &a, ll x, ll lx, ll rx)
+    {
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                arr[x] = {a[lx].l, a[lx].r};
+            }
+            return;
+        }
+
+        ll mid = (lx + rx)/2;
+        build(a, 2*x + 1, lx, mid);
+        build(a, 2*x + 2, mid, rx);
+
+        arr[x] = merge(arr[2*x + 1], arr[2*x + 2]);
+    }
+
+    void build(vector<interval> &a)
+    {
+        build(a, 0, 0, size);
+    }
+
+    interval query(ll l, ll r, ll x, ll lx, ll rx){
+        if(lx >= r or rx <= l)return NEUTRAL_VAL;
+        if(lx >= l and rx <= r)return arr[x];
+
+        ll mid = (lx + rx)/2;
+        interval v1 = query(l, r, 2*x + 1, lx, mid);
+        interval v2 = query(l, r, 2*x + 2, mid, rx);
+
+        return merge(v1, v2);
+    }    
+
+    interval query(ll l, ll r){
+        return (query(l, r, 0, 0, size));
+    }
+};

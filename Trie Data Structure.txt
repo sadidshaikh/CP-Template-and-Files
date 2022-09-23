@@ -1,0 +1,54 @@
+
+// Find the maximum subarray xor for a given array
+
+struct TrieNode{
+    ll value;
+    TrieNode *bits[2];
+};
+
+struct Trie
+{
+    TrieNode *root;
+
+    Trie() : root(newNode()){}
+     
+    TrieNode *newNode()
+    {
+        TrieNode *temp = new TrieNode;
+        temp->value = 0;
+        temp->bits[0] = temp->bits[1] = NULL;
+        return temp;
+    }  
+
+    void insert(ll pre_xor)
+    {
+        TrieNode *temp = root;
+
+        for(int i = 32; i >= 0; i--){
+            bool val = pre_xor & (1 << i);
+            if(temp->bits[val] == NULL){
+                temp->bits[val] = newNode();
+            }
+            temp = temp->bits[val];
+        }
+
+        temp->value = pre_xor;
+    } 
+
+    ll query(ll pre_xor)
+    {
+        TrieNode *temp = root;
+
+        for(int i = 32; i >= 0; i--){
+            bool val = pre_xor & (1 << i);
+            if(temp->bits[1-val] != NULL){
+                temp = temp->bits[1-val];
+            }
+            else if(temp->bits[val] != NULL){
+                temp = temp->bits[val];
+            }
+        }
+
+        return pre_xor ^ (temp->value);
+    }
+};

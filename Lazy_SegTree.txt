@@ -1,0 +1,90 @@
+// Lazy Segtree to update range values and find nearest zero
+
+struct Segtree
+{
+    ll size;
+    vector<ll> val, lazy;
+
+    void init(ll n){
+        size = 1;
+        while(size < n)size *= 2;
+        val.assign(2*size, INF);
+        lazy.assign(2*size, 0);
+    }
+
+    void merge(ll s){
+        val[s] = min(val[2*s + 1], val[2*s + 2]);
+    }
+
+    void apply(ll s, ll x){
+        val[s] += x;
+        lazy[s] += x;
+    }
+
+    void push(ll s){
+        if(lazy[s] != 0){
+            apply(2*s + 1, lazy[s]);
+            apply(2*s + 2, lazy[s]);
+            lazy[s] = 0;
+        }
+    }
+
+    void build(vi &a, ll s, ll lx, ll rx){
+        if(rx - lx == 1){
+            if(lx < a.size()){
+                val[s] = a[lx];
+            }
+        }
+        else{
+            ll m = (lx + rx)/2;
+            build(a, 2*s + 1, lx, m);
+            build(a, 2*s + 2, m, rx);
+            merge(s);
+        }
+    }
+
+    void build(vi &a){
+        build(a, 0, 0, size);
+    }
+
+    void update(ll l, ll r, ll x, ll s, ll lx, ll rx){
+        if(r <= lx or l >= rx)return;
+        else if(lx >= l and rx <= r){
+            apply(s, x);
+        }
+        else{
+            push(s);
+            ll m = (lx + rx)/2;
+            update(l, r, x, 2*s + 1, lx, m);
+            update(l, r, x, 2*s + 2, m, rx);
+            merge(s);
+        }
+    }
+
+    void update(ll idx, ll x){
+        update(idx, idx + 1, x, 0, 0, size);
+    }
+
+    void update(ll l, ll r, ll x){
+        update(l, r, x, 0, 0, size);
+    }
+
+    ll query(ll s, ll lx, ll rx){
+        if(rx - lx == 1)return lx;
+        else{
+            push(s);
+            ll m = (lx + rx)/2;
+            ll res = -1;
+            if(val[2*s + 2] == 0){
+                res = query(2*s + 2, m, rx);
+            }
+            else res = query(2*s + 1, lx, m);
+            merge(s);
+            return res;
+        }
+    }
+
+    ll query(){
+        return query(0, 0, size);
+    }
+};

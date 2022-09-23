@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+#define ll long long                                
+using namespace std;
+
+int ans;
+vector<int> visit;
+vector<vector<int>> adj;
+
+void dfs(int root,int ht){
+    ans = max(ans,ht);
+    visit[root] = true;
+    for(auto node : adj[root]){
+        if(visit[node])continue;
+        dfs(node,ht+1);
+    }
+}
+
+int main(){
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+
+        visit.assign(n+1,false);
+        adj.assign(n+1,{});
+        queue<ll> q;
+
+        int a; cin >> a;
+        q.push(a);
+
+        bool is = true;
+        int k = 0;
+
+        for(int i = 1; i < n; i++){
+            cin >> a;
+            int top = q.front();
+            while(adj[top].size()!=0&&a<adj[top].back()){
+                q.pop();
+                top = q.front();
+            }
+            adj[top].push(a);
+            q.push(a);
+        }
+
+        ans = 0;
+        dfs(1,adj,0);
+        cout << ans << endl;    
+    }
+    return 0;
+}
